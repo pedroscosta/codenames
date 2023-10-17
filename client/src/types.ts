@@ -1,10 +1,12 @@
 import { GamePhase, Team } from './enums';
 
-export type ServerPayload = string;
+export type ChangeTeamPayload = { team: keyof typeof Team; isSpy: boolean };
+
+export type ServerPayload = string | ChangeTeamPayload;
 
 export type Player = {
   name: string;
-  team: Team;
+  team: keyof typeof Team;
   isSpy: boolean;
   isHost: boolean;
 };

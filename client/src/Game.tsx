@@ -16,12 +16,11 @@ const Game = () => {
   // Handle socket events
   useEffect(() => {
     const updateGameState = (payload: GameStatePayload) => {
-      console.log(payload);
       setGamePhase(payload.phase);
       setPlayers(payload.players);
     };
 
-    socket.emit('requestGameStatus');
+    // socket.emit('requestGameStatus', {room: roomId});
 
     socket.on('updateGameState', updateGameState);
 
@@ -42,7 +41,7 @@ const Game = () => {
           case GamePhase.INPUT_USERNAME:
             return <InputUsername sendToServer={sendToServer} />;
           case GamePhase.WAITING_START:
-            return <WaitingStart players={Object.values(players)} />;
+            return <WaitingStart players={Object.values(players)} sendToServer={sendToServer} />;
           case GamePhase.PLAYING:
           default:
             return null;

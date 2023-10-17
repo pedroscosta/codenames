@@ -1,23 +1,29 @@
-import { Heading, VStack } from '@chakra-ui/react';
+import { HStack, Heading, VStack } from '@chakra-ui/react';
 import { Team } from '../../enums';
-import { Player } from '../../types';
+import { Player, ServerPayload } from '../../types';
 import TeamDisplay from './components/TeamDisplay';
 
-const WaitingStart = ({ players }: { players: Player[] }) => {
-  const teams: Record<Team, { players: Player[]; spies: Player[] }> = {
-    [Team.RED]: {
+const WaitingStart = ({
+  players,
+  sendToServer,
+}: {
+  players: Player[];
+  sendToServer: (event: string, payload: ServerPayload) => void;
+}) => {
+  const teams: Record<keyof typeof Team, { players: Player[]; spies: Player[] }> = {
+    RED: {
       players: [],
       spies: [],
     },
-    [Team.BLUE]: {
+    BLUE: {
       players: [],
       spies: [],
     },
-    [Team.GREEN]: {
+    GREEN: {
       players: [],
       spies: [],
     },
-    [Team.YELLOW]: {
+    YELLOW: {
       players: [],
       spies: [],
     },
@@ -32,13 +38,16 @@ const WaitingStart = ({ players }: { players: Player[] }) => {
   return (
     <VStack>
       <Heading>Pick your team:</Heading>
-      {Object.entries(teams).map(([team, players]) => (
-        <TeamDisplay
-          team={Team[team as keyof typeof Team]}
-          players={players.players}
-          spies={players.spies}
-        />
-      ))}
+      <HStack spacing={12}>
+        {Object.entries(teams).map(([team, players]) => (
+          <TeamDisplay
+            team={team as keyof typeof Team}
+            players={players.players}
+            spies={players.spies}
+            sendToServer={sendToServer}
+          />
+        ))}
+      </HStack>
     </VStack>
   );
 };
