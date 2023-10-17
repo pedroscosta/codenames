@@ -3,7 +3,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import Game from './Game';
-import { ClientPayload } from './types';
+import { ChangeTeamPayload, ClientPayload } from './types';
 
 const app = express();
 const server = http.createServer(app);
@@ -32,10 +32,29 @@ io.on('connection', (socket) => {
 
     const game = rooms[req.room];
 
-    game.registerPlayer(socket.id, req.payload);
+    game.registerPlayer(socket.id, req.payload as string);
     socketRooms[socket.id] = req.room;
 
     if (newGame) game.players[socket.id].isHost = true;
+
+    game.broadcastGameState();
+  });
+
+  socket.use(([event, ...args], next) => {
+    if (
+      !['registerPlayer', 'disconnect'].includes(event) &&
+      (args[0] === undefined || args[0].room === undefined || rooms[args[0].room] === undefined)
+    )
+      return;
+    socket.data.game = rooms[args[0].room];
+    next();
+  });
+
+  socket.on('chooseTeam', (req: ClientPayload) => {
+    const game = socket.data.game as Game;
+    const payload = req.payload as ChangeTeamPayload;
+
+    game.changePlayerTeam(socket.id, payload.team, payload.isSpy);
 
     game.broadcastGameState();
   });

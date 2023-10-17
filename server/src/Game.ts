@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
 import Player from './Player';
-import { GamePhase } from './enums';
+import { GamePhase, Team } from './enums';
 import { GameStatePayload } from './types';
 
 class Game {
@@ -25,6 +25,12 @@ class Game {
     delete this.players[socketId];
 
     if (pickNewHost) this.players[Object.keys(this.players)[0]].isHost = true;
+  }
+
+  public changePlayerTeam(socketId: string, team: Team, isSpy: boolean) {
+    if (this.players[socketId] === undefined) return;
+    this.players[socketId].team = team;
+    this.players[socketId].isSpy = isSpy;
   }
 
   public getGameStatePayload(isSpy: boolean): GameStatePayload {
